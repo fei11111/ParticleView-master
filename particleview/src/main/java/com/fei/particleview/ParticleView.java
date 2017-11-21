@@ -82,10 +82,10 @@ public class ParticleView extends View {
         } else {
             backBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ico_background);
         }
+        typedArray.recycle();
         rectBitmap = Bitmap.createBitmap(rectWidth,rectHeight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(rectBitmap);
         canvas.drawColor(Color.WHITE);
-        typedArray.recycle();
         mMatrix = new Matrix();
         particleBitmap = getThumbnail(context, resourceId);
         initPaint();
@@ -125,7 +125,7 @@ public class ParticleView extends View {
             for (int i = 1; i <= particlesNum; i++) {
                 int x = (int) (getF() * vWidth);
                 int y = (int) (getF() * vHeight);
-                Particle particle = new Particle(particleStyle, mMatrix, mPaint, x, y, particleBitmap, vWidth, vHeight, traslate, rotate, circleRadius,rectBitmap);
+                Particle particle = new Particle(particleStyle, mMatrix, mPaint, x, y, particleBitmap, vWidth, vHeight, rotate, traslate, circleRadius,rectBitmap);
                 particles.add(particle);
             }
         }
@@ -138,7 +138,7 @@ public class ParticleView extends View {
         float v = random.nextFloat();
         if (v < 0.15f) {
             return v + 0.15f;
-        } else if (v >= 0.85f) {
+        } else if (v >= 0.9f) {
             return v - 0.15f;
         } else {
             return v;

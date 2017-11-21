@@ -9,7 +9,9 @@
     <com.fei.particleview.ParticleView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:num="50"
-        app:style="rect"/>
+        app:num="10"
+        app:style="circle"
+        app:traslate="100"
+        app:circleRadius="20"/>
 
 </android.support.constraint.ConstraintLayout>
