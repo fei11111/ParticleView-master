@@ -30,8 +30,16 @@ public class Particle {
     private int vWidth;
     private int vHeight;
     private Random random = new Random();
+    private int rotate;
+    private int traslate;
+    private int particleStyle;
+    private int circleRadius;//圆形
+    private int rectWidth;//方形宽
+    private int rectHeight;//方形高
+    private Bitmap rectBitmap;
 
-    public Particle(Matrix mMatrix, Paint mPaint, int startX, int startY, Bitmap particleBitmap, int vWidth, int vHeight) {
+    public Particle(int particleStyle, Matrix mMatrix, Paint mPaint, int startX, int startY, Bitmap particleBitmap, int vWidth, int vHeight, int rotate, int traslate, int circleRadius, Bitmap rectBitmap) {
+        this.particleStyle = particleStyle;
         this.mMatrix = mMatrix;
         this.mPaint = mPaint;
         this.startX = startX;
@@ -48,17 +56,86 @@ public class Particle {
         mDegree = random.nextInt(20);
         isAddX = random.nextBoolean();
         isAddY = random.nextBoolean();
+        this.rotate = rotate;
+        this.traslate = traslate;
+        this.circleRadius = circleRadius;
+        this.rectBitmap = rectBitmap;
+        if (rectBitmap != null) {
+            rectWidth = rectBitmap.getWidth();
+            rectHeight = rectBitmap.getHeight();
+        }
     }
 
     public void drawItem(Canvas canvas) {
-        mMatrix.reset();
         startX = startX + getDistValue(isAddX, distX);
         startY = startY + getDistValue(isAddY, distY);
         centerX = (startX + particleWidth) / 2;
         centerY = (startY + particleHeight) / 2;
-        if (startX <= 0 || startX + particleWidth >= vWidth) {
+        if (particleStyle == ParticleView.ParticleStyle.CIRCLE.ordinal()) {
+            drawCircle(canvas);
+        } else if (particleStyle == ParticleView.ParticleStyle.RECT.ordinal()) {
+            drawRect(canvas);
+        } else if (particleStyle == ParticleView.ParticleStyle.IMGE.ordinal()) {
+            drawImage(canvas);
+        }
+        randomValue();
+    }
+
+    //圆形只有位移，没有旋转
+    private void drawCircle(Canvas canvas) {
+        if (centerX - circleRadius < 0 || centerX + circleRadius > vWidth) {
+            isAddX = !isAddX;//需要转变
+            if (centerX - circleRadius < 0) {
+                centerX = circleRadius;
+            } else {
+                centerX = vWidth - circleRadius;
+            }
+        }
+        if (centerY - circleRadius < 0 || centerY + circleRadius > vHeight) {
+            isAddY = !isAddY;//需要转变
+            if (centerY - circleRadius < 0) {
+                centerY = circleRadius;
+            } else {
+                centerY = vHeight - circleRadius;
+            }
+        }
+        canvas.drawCircle(centerX, centerY, circleRadius, mPaint);
+    }
+
+    //方形
+    private void drawRect(Canvas canvas) {
+        if (startX < 0 || startX + rectWidth > vWidth) {
             isAddX = !isAddX;
-            if (startX <= 0) {
+            if (startX < 0) {
+                startX = 0;
+                centerX = rectWidth / 2;
+            } else {
+                startX = vWidth - rectWidth;
+                centerX = vWidth - rectWidth / 2;
+            }
+        }
+        if (startY < 0 || startY + rectHeight > vHeight) {
+            isAddY = !isAddY;
+            if (startY < 0) {
+                startY = 0;
+                centerY = rectHeight / 2;
+            } else {
+                startY = vHeight - rectHeight;
+                centerY = vHeight - rectHeight / 2;
+            }
+        }
+        mMatrix.preRotate(mDegree, centerX, centerY);
+        mMatrix.preTranslate(startX, startY);
+        Bitmap bm = Bitmap.createBitmap(rectBitmap, 0, 0, rectWidth,
+                rectHeight, mMatrix, true);
+        canvas.drawBitmap(bm, startX, startY, null);
+    }
+
+    private void drawImage(Canvas canvas) {
+        mMatrix.reset();
+        if (startX < 0 || startX + particleWidth > vWidth) {
+            isAddX = !isAddX;
+            if (startX < 0) {
                 startX = 0;
                 centerX = particleWidth / 2;
             } else {
@@ -66,12 +143,12 @@ public class Particle {
                 centerX = vWidth - particleWidth / 2;
             }
         }
-        if (startY <= 0 || startY + particleHeight >= vHeight) {
+        if (startY < 0 || startY + particleHeight > vHeight) {
             isAddY = !isAddY;
-            if(startY<=0) {
+            if (startY <= 0) {
                 startY = 0;
                 centerY = particleHeight / 2;
-            }else {
+            } else {
                 startY = vHeight - particleHeight;
                 centerY = vHeight - particleHeight / 2;
             }
@@ -80,14 +157,13 @@ public class Particle {
         mMatrix.preTranslate(startX, startY);
         Bitmap bm = Bitmap.createBitmap(particleBitmap, 0, 0, particleWidth,
                 particleHeight, mMatrix, true);
-        canvas.drawBitmap(bm,startX,startY,null);
-        randomValue();
+        canvas.drawBitmap(bm, startX, startY, null);
     }
 
     private void randomValue() {
-        mDegree += random.nextInt(5) + 3;
-        distX = random.nextInt(2) + 2;
-        distY = random.nextInt(2) + 2;
+        mDegree += random.nextInt(rotate) + 5;
+        distX = random.nextInt(traslate) + 2;
+        distY = random.nextInt(traslate) + 2;
     }
 
     private int getDistValue(boolean isAdd, int value) {

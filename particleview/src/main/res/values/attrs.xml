@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="ParticleView">
+        <attr name="style" format="enum">
+            <enum name="circle" value="0"></enum>
+            <enum name="rect" value="1"></enum>
+            <enum name="imge" value="2"></enum>
+        </attr>
         <attr name="src" format="reference"></attr>
         <attr name="num" format="integer"></attr>
         <attr name="background" format="reference"></attr>
+        <attr name="traslate" format="integer"></attr>
+        <attr name="rotate" format="integer"></attr>
+        <attr name="circleRadius" format="integer"></attr>
+        <attr name="rectWidth" format="integer"></attr>
+        <attr name="rectHeight" format="integer"></attr>
     </declare-styleable>
 </resources>

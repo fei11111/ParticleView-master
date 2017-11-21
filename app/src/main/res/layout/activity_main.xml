@@ -8,6 +8,8 @@
 
     <com.fei.particleview.ParticleView
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        app:num="50"
+        app:style="rect"/>
 
 </android.support.constraint.ConstraintLayout>

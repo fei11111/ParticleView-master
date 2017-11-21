@@ -27,16 +27,35 @@ import java.util.Random;
 
 public class ParticleView extends View {
 
+    //绘制类型
+    public enum ParticleStyle {
+        CIRCLE, RECT, IMGE;
+    }
+
+    private final int DEFAULT_TRASLATE = 20;//默认位移值
+    private final int DEFAULT_ROTATE = 10;//默认旋转值
+    private final int DEFAULT_NUM = 25;//默认个数
+    private final int DEFAULT_CIRCLE_RADIUS = 5;//默认圆半径
+    private final int DEFAULT_RECT_WIDTH = 40;//默认方形宽度
+    private final int DEFAULT_RECT_HEIGHT = 30;//默认方形高度
+
+    private int particleStyle;//类型
     private Paint mPaint;
-    private int vWidth;
-    private int vHeight;
+    private int vWidth;//当前view宽度
+    private int vHeight;//当前view高度
     private Bitmap particleBitmap;
-    private int particlesNum = 50;
+    private int particlesNum = 30;
     private ValueAnimator valueAnimator;
     private Bitmap backBitmap;//背景
     private List<Particle> particles = new ArrayList<>();
     private Matrix mMatrix;
     private Random random = new Random();
+    private int traslate;//位移距离
+    private int rotate;//旋转角度
+    private int circleRadius;
+    private int rectWidth;
+    private int rectHeight;
+    private Bitmap rectBitmap;
 
     public ParticleView(Context context) {
         this(context, null);
@@ -49,14 +68,23 @@ public class ParticleView extends View {
     public ParticleView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.ParticleView);
+        particleStyle = typedArray.getInt(R.styleable.ParticleView_style, ParticleStyle.CIRCLE.ordinal());
         int resourceId = typedArray.getResourceId(R.styleable.ParticleView_src, R.drawable.fire_star);
-        particlesNum = typedArray.getInt(R.styleable.ParticleView_num, particlesNum);
+        particlesNum = typedArray.getInt(R.styleable.ParticleView_num, DEFAULT_NUM);
+        traslate = typedArray.getInt(R.styleable.ParticleView_traslate, DEFAULT_TRASLATE);
+        rotate = typedArray.getInt(R.styleable.ParticleView_rotate, DEFAULT_ROTATE);
+        circleRadius = typedArray.getInt(R.styleable.ParticleView_circleRadius, DEFAULT_CIRCLE_RADIUS);
+        rectWidth = typedArray.getInt(R.styleable.ParticleView_rectWidth, DEFAULT_RECT_WIDTH);
+        rectHeight = typedArray.getInt(R.styleable.ParticleView_rectHeight, DEFAULT_RECT_HEIGHT);
         BitmapDrawable drawable = (BitmapDrawable) typedArray.getDrawable(R.styleable.ParticleView_background);
         if (drawable != null) {
             backBitmap = drawable.getBitmap();
         } else {
             backBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ico_background);
         }
+        rectBitmap = Bitmap.createBitmap(rectWidth,rectHeight, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(rectBitmap);
+        canvas.drawColor(Color.WHITE);
         typedArray.recycle();
         mMatrix = new Matrix();
         particleBitmap = getThumbnail(context, resourceId);
@@ -97,7 +125,7 @@ public class ParticleView extends View {
             for (int i = 1; i <= particlesNum; i++) {
                 int x = (int) (getF() * vWidth);
                 int y = (int) (getF() * vHeight);
-                Particle particle = new Particle(mMatrix, mPaint, x, y, particleBitmap, vWidth, vHeight);
+                Particle particle = new Particle(particleStyle, mMatrix, mPaint, x, y, particleBitmap, vWidth, vHeight, traslate, rotate, circleRadius,rectBitmap);
                 particles.add(particle);
             }
         }
